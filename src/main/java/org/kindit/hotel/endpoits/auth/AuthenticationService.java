@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthenticationService extends ControllerService {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
