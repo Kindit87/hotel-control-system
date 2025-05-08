@@ -1,6 +1,10 @@
-package org.kindit.hotel.auth;
+package org.kindit.hotel.endpoits.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.kindit.hotel.ApiController;
+import org.kindit.hotel.endpoits.auth.request.AuthenticationRequest;
+import org.kindit.hotel.endpoits.auth.request.RegisterRequest;
+import org.kindit.hotel.endpoits.auth.response.AuthenticationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

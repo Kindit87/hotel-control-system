@@ -1,7 +1,11 @@
-package org.kindit.hotel.auth;
+package org.kindit.hotel.endpoits.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.kindit.hotel.ControllerService;
 import org.kindit.hotel.config.JwtService;
+import org.kindit.hotel.endpoits.auth.request.AuthenticationRequest;
+import org.kindit.hotel.endpoits.auth.request.RegisterRequest;
+import org.kindit.hotel.endpoits.auth.response.AuthenticationResponse;
 import org.kindit.hotel.user.Role;
 import org.kindit.hotel.user.User;
 import org.kindit.hotel.user.UserRepository;

@@ -1,4 +1,4 @@
-package org.kindit.hotel.auth;
+package org.kindit.hotel.endpoits.auth.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
