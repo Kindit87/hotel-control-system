@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.ApiController;
 import org.kindit.hotel.Repository;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
-import org.kindit.hotel.user.User;
+import org.kindit.hotel.data.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -42,19 +41,24 @@ public class UserController extends ApiController<UserService> {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<User> post(@PathVariable Integer id, @Validated @RequestBody UserRequest request) {
-        if (repository.getUserRepository().findByEmail(request.getEmail()).isEmpty())
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with this email already exists");
-
-        User user = service.post(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(user);
+    @PostMapping
+    public ResponseEntity<User> post(@RequestBody UserRequest request) {
+        try {
+            User user = service.post(request);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(user);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> put(@PathVariable Integer id, @Validated @RequestBody UserRequest request) {
+    public ResponseEntity<User> put(@PathVariable Integer id, @RequestBody UserRequest request) {
+        if (id < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
+        }
+
         try {
             User updatedUser = service.put(id, request);
             return ResponseEntity.ok(updatedUser);
@@ -71,5 +75,35 @@ public class UserController extends ApiController<UserService> {
         }
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<User> patch(@PathVariable Integer id, @RequestBody UserRequest request) {
+        if (id < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
+        }
 
+        try {
+            User updatedUser = service.patch(id, request);
+            return ResponseEntity.ok(updatedUser);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> delete(@PathVariable Integer id) {
+        if (id < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
+        }
+
+        boolean deleted = service.delete(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

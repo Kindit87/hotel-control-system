@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.ControllerService;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
-import org.kindit.hotel.user.User;
+import org.kindit.hotel.data.user.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -60,5 +60,39 @@ public class UserService extends ControllerService {
         existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
         return repository.getUserRepository().save(existingUser);
+    }
+
+    public User patch(Integer id, UserRequest request) {
+        User existingUser = repository.getUserRepository().findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+
+        if (request.getFirstname() != null) {
+            existingUser.setFirstname(request.getFirstname());
+        }
+        if (request.getLastname() != null) {
+            existingUser.setLastname(request.getLastname());
+        }
+        if (request.getEmail() != null) {
+            // Можно проверить на уникальность email тут тоже, если хочешь
+            existingUser.setEmail(request.getEmail());
+        }
+        if (request.getPassword() != null) {
+            existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        if (request.getRole() != null) {
+            existingUser.setRole(request.getRole());
+        }
+
+        return repository.getUserRepository().save(existingUser);
+    }
+
+    public boolean delete(Integer id) {
+        return repository.getUserRepository()
+                .findById(id)
+                .map(user -> {
+                    repository.getUserRepository().delete(user);
+                    return true;
+                })
+                .orElse(false);
     }
 }

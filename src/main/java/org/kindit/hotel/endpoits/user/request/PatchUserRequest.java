@@ -1,10 +1,16 @@
 package org.kindit.hotel.endpoits.user.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.kindit.hotel.data.user.Role;
 
 @Data
-public class UserRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PatchUserRequest {
     private String firstname;
     private String lastname;
     private String email;

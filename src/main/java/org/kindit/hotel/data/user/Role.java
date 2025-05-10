@@ -1,4 +1,4 @@
-package org.kindit.hotel.user;
+package org.kindit.hotel.data.user;
 
 public enum Role {
 

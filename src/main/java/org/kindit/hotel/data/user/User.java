@@ -1,4 +1,4 @@
-package org.kindit.hotel.user;
+package org.kindit.hotel.data.user;
 
 import jakarta.persistence.*;
 import lombok.*;

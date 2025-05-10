@@ -2,7 +2,7 @@ package org.kindit.hotel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.kindit.hotel.user.UserRepository;
+import org.kindit.hotel.data.user.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
