@@ -2,7 +2,7 @@ package org.kindit.hotel.endpoits.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.kindit.hotel.ApiController;
+import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.Repository;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
 import org.kindit.hotel.data.user.User;

@@ -2,7 +2,7 @@ package org.kindit.hotel.endpoits.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.kindit.hotel.ControllerService;
+import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
 import org.kindit.hotel.data.user.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService extends ControllerService {
+public class UserService extends ServiceController {
 
     private final PasswordEncoder passwordEncoder;
 

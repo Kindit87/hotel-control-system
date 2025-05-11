@@ -1,7 +1,7 @@
 package org.kindit.hotel.endpoits.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.kindit.hotel.ControllerService;
+import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.config.JwtService;
 import org.kindit.hotel.endpoits.auth.request.AuthenticationRequest;
 import org.kindit.hotel.endpoits.auth.request.RegisterRequest;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService extends ControllerService {
+public class AuthenticationService extends ServiceController {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;

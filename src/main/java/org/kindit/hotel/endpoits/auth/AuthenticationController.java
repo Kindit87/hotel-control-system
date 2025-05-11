@@ -1,7 +1,7 @@
 package org.kindit.hotel.endpoits.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.kindit.hotel.ApiController;
+import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.auth.request.AuthenticationRequest;
 import org.kindit.hotel.endpoits.auth.request.RegisterRequest;
 import org.kindit.hotel.endpoits.auth.response.AuthenticationResponse;

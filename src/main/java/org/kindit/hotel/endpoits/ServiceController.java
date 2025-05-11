@@ -1,8 +1,9 @@
-package org.kindit.hotel;
+package org.kindit.hotel.endpoits;
 
+import org.kindit.hotel.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class ControllerService {
+public abstract class ServiceController {
     @Autowired
     protected Repository repository;
 }
