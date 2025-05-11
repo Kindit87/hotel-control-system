@@ -19,4 +19,5 @@ public class RoomRequest {
     private String description;
     private MultipartFile image;
     private Boolean isAvailable;
+    private List<Integer> additionalServiceIds;
 }

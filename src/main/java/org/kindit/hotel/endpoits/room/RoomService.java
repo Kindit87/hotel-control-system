@@ -3,6 +3,7 @@ package org.kindit.hotel.endpoits.room;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.kindit.hotel.data.additionalService.AdditionalService;
 import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.room.request.RoomRequest;
@@ -37,6 +38,8 @@ public class RoomService extends ServiceController {
 
     public Room createRoom(RoomRequest request) {
         String imageName = "";
+        List<AdditionalService> additionalServices = repository.getAdditionalServiceRepository()
+                .findAllById(request.getAdditionalServiceIds());
 
         if (!request.getImage().isEmpty()) {
             imageName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
@@ -56,6 +59,7 @@ public class RoomService extends ServiceController {
                 .description(request.getDescription())
                 .imagePath(imageName)
                 .isAvailable(request.getIsAvailable())
+                .additionalServices(additionalServices)
                 .build();
 
         return repository.getRoomRepository().save(room);
@@ -63,10 +67,14 @@ public class RoomService extends ServiceController {
 
     public Optional<Room> updateAllRoom(Integer id, RoomRequest request) {
         return repository.getRoomRepository().findById(id).map(existing -> {
+            List<AdditionalService> additionalServices = repository.getAdditionalServiceRepository()
+                    .findAllById(request.getAdditionalServiceIds());
+
             existing.setNumber(request.getNumber());
             existing.setPricePerNight(request.getPricePerNight());
             existing.setDescription(request.getDescription());
             existing.setAvailable(request.getIsAvailable());
+            existing.setAdditionalServices(additionalServices);
 
             if (request.getImage() != null && !request.getImage().isEmpty()) {
                 String imageName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
@@ -106,6 +114,13 @@ public class RoomService extends ServiceController {
                     throw new RuntimeException(e);
                 }
                 existing.setImagePath(String.valueOf(imagePath));
+            }
+
+            if (request.getAdditionalServiceIds() != null) {
+                List<AdditionalService> additionalServices = repository.getAdditionalServiceRepository()
+                        .findAllById(request.getAdditionalServiceIds());
+
+                existing.setAdditionalServices(additionalServices);
             }
 
             return repository.getRoomRepository().save(existing);
