@@ -1,5 +1,6 @@
 package org.kindit.hotel.endpoits.room;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.endpoits.ApiController;
@@ -75,12 +76,11 @@ public class RoomController extends ApiController<RoomService> {
                 String contentType = Files.probeContentType(file);
 
                 if (contentType == null) {
-                    contentType = "application/octet-stream";  // Устанавливаем default тип
+                    contentType = "application/octet-stream";
                 }
 
-                // Возвращаем ресурс с нужным типом контента
                 return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))  // Указываем правильный Content-Type
+                        .contentType(MediaType.parseMediaType(contentType))
                         .body(resource);
             } else {
                 return ResponseEntity.notFound().build();

@@ -2,10 +2,9 @@ package org.kindit.hotel.endpoits.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.kindit.hotel.endpoits.ApiController;
-import org.kindit.hotel.Repository;
-import org.kindit.hotel.endpoits.user.request.UserRequest;
 import org.kindit.hotel.data.user.User;
+import org.kindit.hotel.endpoits.ApiController;
+import org.kindit.hotel.endpoits.user.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,6 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 public class UserController extends ApiController<UserService> {
-
-    private final Repository repository;
 
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAll() {
