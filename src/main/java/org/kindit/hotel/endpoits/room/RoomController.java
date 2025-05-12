@@ -48,7 +48,7 @@ public class RoomController extends ApiController<RoomService> {
 
     @PutMapping("/{id}")
     public ResponseEntity<Room> updateAllRoom(@PathVariable Integer id, @ModelAttribute RoomRequest request) {
-        return service.updateAllRoom(id, request)
+        return service.refreshRoom(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

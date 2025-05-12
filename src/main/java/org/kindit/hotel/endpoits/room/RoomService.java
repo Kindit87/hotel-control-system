@@ -65,7 +65,7 @@ public class RoomService extends ServiceController {
         return repository.getRoomRepository().save(room);
     }
 
-    public Optional<Room> updateAllRoom(Integer id, RoomRequest request) {
+    public Optional<Room> refreshRoom(Integer id, RoomRequest request) {
         return repository.getRoomRepository().findById(id).map(existing -> {
             List<AdditionalService> additionalServices = repository.getAdditionalServiceRepository()
                     .findAllById(request.getAdditionalServiceIds());
