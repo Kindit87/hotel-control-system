@@ -10,6 +10,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.util.List;
 public class RoomController extends ApiController<RoomService> {
 
     @GetMapping("all")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<List<Room>> getAllRooms() {
         return ResponseEntity.ok(service.getAllRooms());
     }
@@ -41,12 +43,14 @@ public class RoomController extends ApiController<RoomService> {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<Room> createRoom(@ModelAttribute RoomRequest request) {
         Room room = service.createRoom(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<Room> updateAllRoom(@PathVariable Integer id, @ModelAttribute RoomRequest request) {
         return service.refreshRoom(id, request)
                 .map(ResponseEntity::ok)
@@ -54,6 +58,7 @@ public class RoomController extends ApiController<RoomService> {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<Room> updateRoom(@PathVariable Integer id, @ModelAttribute RoomRequest request) {
         return service.updateRoom(id, request)
                 .map(ResponseEntity::ok)
@@ -61,6 +66,7 @@ public class RoomController extends ApiController<RoomService> {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<?> deleteRoom(@PathVariable Integer id) {
         try {
             boolean deleted = service.deleteRoom(id);
