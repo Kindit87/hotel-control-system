@@ -23,7 +23,10 @@ public class User implements UserDetails {
 
     private String firstname;
     private String lastname;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
 
     @Enumerated(EnumType.STRING)
