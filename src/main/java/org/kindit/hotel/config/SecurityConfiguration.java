@@ -27,9 +27,11 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/room/all/available",
-                                "/api/v1/room/image/**"
-                        )
-                        .permitAll()
+                                "/api/v1/room/image/**",
+                                "/api/v1/room/all",
+                                "/api/v1/room/{id:[0-9]+}"
+                        ).permitAll()
+                        .requestMatchers("/api/v1/user/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
