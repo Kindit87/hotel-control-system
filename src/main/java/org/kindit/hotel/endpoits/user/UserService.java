@@ -17,6 +17,7 @@ import java.util.Optional;
 public class UserService extends ServiceController {
 
     private final PasswordEncoder passwordEncoder;
+    private final String uploadDir = "uploads/rooms/";
 
     public List<User> getAll() {
         return repository.getUserRepository().findAll();
@@ -27,9 +28,15 @@ public class UserService extends ServiceController {
     }
 
     public User post(UserRequest request) {
+        String imageName = "";
+
         repository.getUserRepository().findByEmail(request.getEmail()).ifPresent(u -> {
             throw new IllegalArgumentException("User with this email already exists");
         });
+
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            imageName = saveImage(Path.of(uploadDir), request.getImage());
+        }
 
         User user = User.builder()
                 .firstname(request.getFirstname())
@@ -37,6 +44,7 @@ public class UserService extends ServiceController {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .image(imageName)
                 .build();
 
         repository.getUserRepository().save(user);
@@ -45,6 +53,8 @@ public class UserService extends ServiceController {
     }
 
     public User put(Integer id, UserRequest request) {
+        String imageName = "";
+
         User existingUser = repository.getUserRepository().findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
 
@@ -53,11 +63,16 @@ public class UserService extends ServiceController {
                 throw new IllegalArgumentException("Email is already taken by another user");
         });
 
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            imageName = saveImage(Path.of(uploadDir), request.getImage());
+        }
+
         existingUser.setFirstname(request.getFirstname());
         existingUser.setLastname(request.getLastname());
         existingUser.setEmail(request.getEmail());
         existingUser.setRole(request.getRole());
         existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        existingUser.setImage(imageName);
 
         return repository.getUserRepository().save(existingUser);
     }
@@ -76,6 +91,11 @@ public class UserService extends ServiceController {
             // Можно проверить на уникальность email тут тоже, если хочешь
             existingUser.setEmail(request.getEmail());
         }
+
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            existingUser.setImage(saveImage(Path.of(uploadDir), request.getImage()));
+        }
+
         if (request.getPassword() != null) {
             existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
         }
