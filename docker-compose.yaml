@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: hotel-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hotel
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mysecretpassword
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+    networks:
+      - hotel-network
+
+  postgres:
+    image: postgres:15
+    container_name: hotel-postgres
+    environment:
+      POSTGRES_DB: hotel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+
+volumes:
+  postgres_data:
+
+networks:
+  hotel-network:
