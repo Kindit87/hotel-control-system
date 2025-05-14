@@ -34,7 +34,6 @@ public class SecurityConfiguration {
                                 "/api/v1/room/all",
                                 "/api/v1/room/{id:[0-9]+}"
                         ).permitAll()
-                        .requestMatchers("/api/v1/user/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
