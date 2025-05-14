@@ -2,12 +2,13 @@ package org.kindit.hotel.endpoits.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
-import org.kindit.hotel.data.user.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -88,11 +89,12 @@ public class UserService extends ServiceController {
         if (request.getFirstname() != null) {
             existingUser.setFirstname(request.getFirstname());
         }
+
         if (request.getLastname() != null) {
             existingUser.setLastname(request.getLastname());
         }
+
         if (request.getEmail() != null) {
-            // Можно проверить на уникальность email тут тоже, если хочешь
             existingUser.setEmail(request.getEmail());
         }
 
@@ -103,6 +105,7 @@ public class UserService extends ServiceController {
         if (request.getPassword() != null) {
             existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
         }
+
         if (request.getRole() != null) {
             existingUser.setRole(request.getRole());
         }
