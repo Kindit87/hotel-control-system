@@ -39,7 +39,8 @@ public class UserController extends ApiController<UserService> {
     }
 
     @PostMapping
-    public ResponseEntity<User> post(@RequestBody UserRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> post(@ModelAttribute UserRequest request) {
         try {
             User user = service.post(request);
             return ResponseEntity
@@ -51,7 +52,8 @@ public class UserController extends ApiController<UserService> {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> put(@PathVariable Integer id, @RequestBody UserRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> put(@PathVariable Integer id, @ModelAttribute UserRequest request) {
         if (id < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
         }
@@ -73,7 +75,8 @@ public class UserController extends ApiController<UserService> {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> patch(@PathVariable Integer id, @RequestBody UserRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> patch(@PathVariable Integer id, @ModelAttribute UserRequest request) {
         if (id < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
         }
