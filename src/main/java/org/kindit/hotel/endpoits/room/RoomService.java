@@ -41,15 +41,8 @@ public class RoomService extends ServiceController {
         List<AdditionalService> additionalServices = repository.getAdditionalServiceRepository()
                 .findAllById(request.getAdditionalServiceIds());
 
-        if (!request.getImage().isEmpty()) {
-            imageName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
-
-            Path imagePath = Path.of(uploadDir + imageName);
-            try {
-                Files.copy(request.getImage().getInputStream(), imagePath.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            saveImage(Path.of(uploadDir), request.getImage());
         }
 
         Room room = Room.builder()
@@ -77,14 +70,7 @@ public class RoomService extends ServiceController {
             existing.setAdditionalServices(additionalServices);
 
             if (request.getImage() != null && !request.getImage().isEmpty()) {
-                String imageName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
-                Path imagePath = Path.of(uploadDir + imageName);
-                try {
-                    Files.copy(request.getImage().getInputStream(), imagePath.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                existing.setImagePath(String.valueOf(imagePath));
+                existing.setImagePath(saveImage(Path.of(uploadDir), request.getImage()));
             }
 
             return repository.getRoomRepository().save(existing);
@@ -106,14 +92,7 @@ public class RoomService extends ServiceController {
                 existing.setAvailable(request.getIsAvailable());
 
             if (request.getImage() != null && !request.getImage().isEmpty()) {
-                String imageName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
-                Path imagePath = Path.of(uploadDir + imageName);
-                try {
-                    Files.copy(request.getImage().getInputStream(), imagePath.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                existing.setImagePath(String.valueOf(imagePath));
+                existing.setImagePath(saveImage(Path.of(uploadDir), request.getImage()));
             }
 
             if (request.getAdditionalServiceIds() != null) {
