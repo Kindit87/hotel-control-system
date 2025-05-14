@@ -7,6 +7,7 @@ import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserController extends ApiController<UserService> {
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> getAll() {
         List<User> users = service.getAll();
 
@@ -28,12 +30,21 @@ public class UserController extends ApiController<UserService> {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> get(@PathVariable Integer id) {
         if (id < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
         }
 
         return service.get(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    public ResponseEntity<User> getMe() {
+        return service.getMe()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -94,6 +105,7 @@ public class UserController extends ApiController<UserService> {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> delete(@PathVariable Integer id) {
         if (id < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect id");
