@@ -28,15 +28,11 @@ public class BookingService extends ServiceController {
     }
 
     public List<Booking> getAllMy() {
-        User thisUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return repository.getBookingRepository().findByUserId(thisUser.getId());
+        return repository.getBookingRepository().findByUserId(getAuthentifactedUser().getId());
     }
 
     public Optional<Booking> getMy(Integer id) {
-        User thisUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return repository.getBookingRepository().findByIdAndUserId(id, thisUser.getId());
+        return repository.getBookingRepository().findByIdAndUserId(id, getAuthentifactedUser().getId());
     }
 
     public Optional<Booking> create(BookingRequest request) {
