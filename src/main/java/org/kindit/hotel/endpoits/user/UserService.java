@@ -27,6 +27,10 @@ public class UserService extends ServiceController {
         return repository.getUserRepository().findById(id);
     }
 
+    public Optional<User> getMe() {
+        return Optional.of(getAuthentifactedUser());
+    }
+
     public User post(UserRequest request) {
         String imageName = "";
 
