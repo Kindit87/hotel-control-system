@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,8 +24,10 @@ public abstract class ServiceController {
     protected final String saveImage(Path destinationFolder, MultipartFile image) {
         String imageName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-        Path imagePath = Path.of(destinationFolder + imageName);
+        Path imagePath = Path.of(destinationFolder + File.separator + imageName);
+
         try {
+            Files.createDirectories(destinationFolder);
             Files.copy(image.getInputStream(), imagePath.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException(e);
