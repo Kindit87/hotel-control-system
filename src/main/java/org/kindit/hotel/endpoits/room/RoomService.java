@@ -40,7 +40,7 @@ public class RoomService extends ServiceController {
                 .findAllById(request.getAdditionalServiceIds());
 
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            saveImage(Path.of(uploadDir), request.getImage());
+            imageName = saveImage(Path.of(uploadDir), request.getImage());
         }
 
         Room room = Room.builder()
@@ -65,6 +65,7 @@ public class RoomService extends ServiceController {
             existing.setPricePerNight(request.getPricePerNight());
             existing.setDescription(request.getDescription());
             existing.setAvailable(request.getIsAvailable());
+            existing.setCapacity(request.getCapacity());
             existing.setAdditionalServices(additionalServices);
 
             if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -91,6 +92,10 @@ public class RoomService extends ServiceController {
 
             if (request.getImage() != null && !request.getImage().isEmpty()) {
                 existing.setImagePath(saveImage(Path.of(uploadDir), request.getImage()));
+            }
+
+            if (request.getCapacity() != null) {
+                existing.setCapacity(request.getCapacity());
             }
 
             if (request.getAdditionalServiceIds() != null) {
