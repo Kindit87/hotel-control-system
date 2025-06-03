@@ -32,13 +32,13 @@ public class BookingController extends ApiController<BookingService> {
     }
 
     @GetMapping("/me/all")
-    @PreAuthorize("hasAnyRole('USER', MODERATOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<List<Booking>> getMyBookings() {
         return ResponseEntity.ok(bookingService.getAllMy());
     }
 
     @GetMapping("/me/{id}")
-    @PreAuthorize("hasAnyRole('USER', MODERATOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<Booking> getMyBookings(@PathVariable Integer id) {
         return bookingService.getMy(id)
                 .map(ResponseEntity::ok)
@@ -54,7 +54,7 @@ public class BookingController extends ApiController<BookingService> {
     }
 
     @PostMapping("/me")
-    @PreAuthorize("hasAnyRole('USER', MODERATOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
     public ResponseEntity<Booking> createMyBooking(@RequestBody BookingRequest request) {
         return bookingService.createMy(request)
                 .map(ResponseEntity::ok)
