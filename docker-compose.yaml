@@ -18,7 +18,7 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: hotel-postgres
+    container_name: hotel-db
     environment:
       POSTGRES_DB: hotel
       POSTGRES_USER: postgres
