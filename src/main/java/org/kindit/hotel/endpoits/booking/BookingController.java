@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.booking.Booking;
 import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
+import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +56,7 @@ public class BookingController extends ApiController<BookingService> {
 
     @PostMapping("/me")
     @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
-    public ResponseEntity<Booking> createMyBooking(@RequestBody BookingRequest request) {
+    public ResponseEntity<Booking> createMyBooking(@RequestBody MyBookingRequest request) {
         return bookingService.createMy(request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());

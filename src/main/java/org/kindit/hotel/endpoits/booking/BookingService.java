@@ -8,6 +8,7 @@ import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
+import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +80,7 @@ public class BookingService extends ServiceController {
         return Optional.of(repository.getBookingRepository().save(booking));
     }
 
-    public Optional<Booking> createMy(BookingRequest request) {
+    public Optional<Booking> createMy(MyBookingRequest request) {
         User thisUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Room room = repository.getRoomRepository().findById(request.getRoomId())
