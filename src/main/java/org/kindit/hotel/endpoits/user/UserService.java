@@ -18,7 +18,7 @@ import java.util.Optional;
 public class UserService extends ServiceController {
 
     private final PasswordEncoder passwordEncoder;
-    private final String uploadDir = "uploads/rooms/";
+    private final String uploadDir = "uploads/users/";
 
     public List<User> getAll() {
         return repository.getUserRepository().findAll();

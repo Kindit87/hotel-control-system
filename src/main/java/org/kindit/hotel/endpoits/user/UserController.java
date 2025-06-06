@@ -5,12 +5,19 @@ import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.user.request.UserRequest;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -116,6 +123,30 @@ public class UserController extends ApiController<UserService> {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/image/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        try {
+            Path file = Paths.get("uploads/users/" + filename).toAbsolutePath();
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists()) {
+                String contentType = Files.probeContentType(file);
+
+                if (contentType == null) {
+                    contentType = "application/octet-stream";
+                }
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
