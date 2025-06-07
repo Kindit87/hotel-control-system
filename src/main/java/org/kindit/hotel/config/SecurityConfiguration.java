@@ -38,7 +38,7 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/**",
                                 "/api/v1/room/all/available",
                                 "/api/v1/room/image/**",
-f                                "/api/v1/user/image/**",
+                                "/api/v1/user/image/**",
                                 "/api/v1/room/all",
                                 "/api/v1/room/{id:[0-9]+}"
                         ).permitAll()
