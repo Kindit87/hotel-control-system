@@ -119,6 +119,12 @@ public class UserService extends ServiceController {
         return repository.getUserRepository().save(existingUser);
     }
 
+    public User patchMe(UserRequest request) {
+        User me = getAuthentifactedUser();
+
+        return patch(me.getId(), request);
+    }
+
     public boolean delete(Integer id) {
         return repository.getUserRepository()
                 .findById(id)

@@ -130,6 +130,18 @@ public class UserController extends ApiController<UserService> {
         }
     }
 
+    @PatchMapping("/me")
+    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    public ResponseEntity<User> patch(@ModelAttribute UserRequest request) {
+        try {
+            User updatedUser = service.patchMe(request);
+            return ResponseEntity.ok(updatedUser);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> delete(@PathVariable Integer id) {
