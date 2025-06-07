@@ -92,6 +92,25 @@ public class UserController extends ApiController<UserService> {
         }
     }
 
+    @PutMapping("/me")
+    @PreAuthorize("hasAnyRole('USER', 'MANAGER', 'ADMIN')")
+    public ResponseEntity<User> put(@ModelAttribute UserRequest request) {
+        try {
+            User updatedUser = service.putMe(request);
+            return ResponseEntity.ok(updatedUser);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(null);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(null);
+        }
+    }
+
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> patch(@PathVariable Integer id, @ModelAttribute UserRequest request) {

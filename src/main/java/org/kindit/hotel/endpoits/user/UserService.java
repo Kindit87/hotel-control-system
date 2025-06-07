@@ -82,6 +82,12 @@ public class UserService extends ServiceController {
         return repository.getUserRepository().save(existingUser);
     }
 
+    public User putMe(UserRequest request) {
+        User me = getAuthentifactedUser();
+
+        return put(getAuthentifactedUser().getId(), request);
+    }
+
     public User patch(Integer id, UserRequest request) {
         User existingUser = repository.getUserRepository().findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
