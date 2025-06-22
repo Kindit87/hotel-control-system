@@ -12,6 +12,7 @@ import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,16 @@ public class BookingService extends ServiceController {
     }
 
     public Optional<Booking> create(BookingRequest request) {
+        LocalDate today = LocalDate.now();
+
+        if (request.getCheckInDate().isBefore(today) || request.getCheckOutDate().isBefore(today)) {
+            throw new IllegalArgumentException("Cannot book for past dates");
+        }
+
+        if (!request.getCheckOutDate().isAfter(request.getCheckInDate())) {
+            throw new IllegalArgumentException("The departure date must be at least 1 day after the arrival date");
+        }
+
         User user = repository.getUserRepository().findById(request.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
@@ -47,22 +58,19 @@ public class BookingService extends ServiceController {
                 .findByRoomId(room.getId());
 
         boolean isOverlapping = existingBookings.stream().anyMatch(b ->
-                ( !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
-                        !request.getCheckOutDate().isBefore(b.getCheckInDate()) )
+                !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
+                        !request.getCheckOutDate().isBefore(b.getCheckInDate())
         );
 
         if (isOverlapping) {
             throw new IllegalStateException("Room is already booked for the selected dates");
         }
 
-        room.setAvailable(false);
-        repository.getRoomRepository().save(room);
-
         List<AdditionalService> services = repository.getAdditionalServiceRepository()
                 .findAllById(request.getAdditionalServiceIds());
 
         int totalPrice = room.getPricePerNight() *
-                (int) (ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate()));
+                (int) ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate());
 
         int additionalServicesPrice = services.stream()
                 .mapToInt(AdditionalService::getPrice)
@@ -81,6 +89,16 @@ public class BookingService extends ServiceController {
     }
 
     public Optional<Booking> createMy(MyBookingRequest request) {
+        LocalDate today = LocalDate.now();
+
+        if (request.getCheckInDate().isBefore(today) || request.getCheckOutDate().isBefore(today)) {
+            throw new IllegalArgumentException("Cannot book for past dates");
+        }
+
+        if (!request.getCheckOutDate().isAfter(request.getCheckInDate())) {
+            throw new IllegalArgumentException("The departure date must be at least 1 day after the arrival date.");
+        }
+
         User thisUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Room room = repository.getRoomRepository().findById(request.getRoomId())
@@ -90,22 +108,19 @@ public class BookingService extends ServiceController {
                 .findByRoomId(room.getId());
 
         boolean isOverlapping = existingBookings.stream().anyMatch(b ->
-                ( !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
-                        !request.getCheckOutDate().isBefore(b.getCheckInDate()) )
+                !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
+                        !request.getCheckOutDate().isBefore(b.getCheckInDate())
         );
 
         if (isOverlapping) {
             throw new IllegalStateException("Room is already booked for the selected dates");
         }
 
-        room.setAvailable(false);
-        repository.getRoomRepository().save(room);
-
         List<AdditionalService> services = repository.getAdditionalServiceRepository()
                 .findAllById(request.getAdditionalServiceIds());
 
         int totalPrice = room.getPricePerNight() *
-                (int) (ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate()));
+                (int) ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate());
 
         int additionalServicesPrice = services.stream()
                 .mapToInt(AdditionalService::getPrice)

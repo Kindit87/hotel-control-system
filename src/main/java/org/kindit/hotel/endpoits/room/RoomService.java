@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.additionalService.AdditionalService;
+import org.kindit.hotel.data.booking.Booking;
 import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.room.request.RoomRequest;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Service
@@ -30,8 +33,18 @@ public class RoomService extends ServiceController {
         return repository.getRoomRepository().findById(id);
     }
 
-    public List<Room> getAllAvailableRoom() {
-        return repository.getRoomRepository().findByIsAvailableTrue();
+    public List<Room> getAllAvailableRoom(LocalDate checkIn, LocalDate checkOut) {
+        List<Room> allRooms = repository.getRoomRepository().findAll();
+
+        return allRooms.stream()
+                .filter(room -> {
+                    List<Booking> bookings = repository.getBookingRepository().findByRoomId(room.getId());
+                    return bookings.stream().noneMatch(b ->
+                            !checkOut.isBefore(b.getCheckInDate()) &&
+                                    !checkIn.isAfter(b.getCheckOutDate())
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public Room createRoom(RoomRequest request) {

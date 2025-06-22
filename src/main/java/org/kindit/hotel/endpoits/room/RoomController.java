@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,8 +32,8 @@ public class RoomController extends ApiController<RoomService> {
     }
 
     @GetMapping("/all/available")
-    public ResponseEntity<List<Room>> getAllAvailableRoom() {
-        return ResponseEntity.ok(service.getAllAvailableRoom());
+    public ResponseEntity<List<Room>> getAllAvailableRoom(@RequestParam LocalDate checkIn, @RequestParam LocalDate checkOut) {
+        return ResponseEntity.ok(service.getAllAvailableRoom(checkIn, checkOut));
     }
 
     @GetMapping("/{id}")
