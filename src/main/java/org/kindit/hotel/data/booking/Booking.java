@@ -40,5 +40,8 @@ public class Booking {
     )
     private List<AdditionalService> additionalServices;
 
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
+
     private Integer totalPrice;
 }

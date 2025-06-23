@@ -1,6 +1,7 @@
 package org.kindit.hotel.endpoits.booking.request;
 
 import lombok.Data;
+import org.kindit.hotel.data.booking.BookingStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,4 +13,5 @@ public class BookingRequest {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private List<Integer> additionalServiceIds;
+    private BookingStatus status;
 }

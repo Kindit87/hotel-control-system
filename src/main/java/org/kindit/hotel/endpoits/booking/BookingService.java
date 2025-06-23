@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.additionalService.AdditionalService;
 import org.kindit.hotel.data.booking.Booking;
+import org.kindit.hotel.data.booking.BookingStatus;
 import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ServiceController;
@@ -82,6 +83,7 @@ public class BookingService extends ServiceController {
                 .checkInDate(request.getCheckInDate())
                 .checkOutDate(request.getCheckOutDate())
                 .additionalServices(services)
+                .status(BookingStatus.PENDING)
                 .totalPrice(totalPrice + additionalServicesPrice)
                 .build();
 
@@ -133,6 +135,7 @@ public class BookingService extends ServiceController {
                 .checkOutDate(request.getCheckOutDate())
                 .additionalServices(services)
                 .totalPrice(totalPrice + additionalServicesPrice)
+                .status(BookingStatus.PENDING)
                 .build();
 
         return Optional.of(repository.getBookingRepository().save(booking));
@@ -179,6 +182,7 @@ public class BookingService extends ServiceController {
             booking.setCheckInDate(request.getCheckInDate());
             booking.setCheckOutDate(request.getCheckOutDate());
             booking.setAdditionalServices(services);
+            booking.setStatus(request.getStatus() != null ? request.getStatus() : BookingStatus.PENDING);
             booking.setTotalPrice(totalPrice + additionalServicesPrice);
 
             return repository.getBookingRepository().save(booking);
@@ -242,8 +246,54 @@ public class BookingService extends ServiceController {
                 booking.setTotalPrice(totalPrice + additionalServicesPrice);
             }
 
+            if (request.getStatus() != null) {
+                booking.setStatus(request.getStatus());
+            }
+
             return repository.getBookingRepository().save(booking);
         });
+    }
+
+    public Optional<Booking> cancel(Integer bookingId) {
+        return repository.getBookingRepository().findById(bookingId).map(booking -> {
+            if (booking.getStatus() == BookingStatus.CANCELLED) {
+                return booking; // уже отменено
+            }
+            booking.setStatus(BookingStatus.CANCELLED);
+            booking.getRoom().setAvailable(true);
+            repository.getRoomRepository().save(booking.getRoom());
+            return repository.getBookingRepository().save(booking);
+        });
+    }
+
+    public Optional<Booking> cancelMy(Integer bookingId) {
+        User currentUser = getAuthentifactedUser();
+
+        return repository.getBookingRepository()
+                .findByIdAndUserId(bookingId, currentUser.getId())
+                .map(booking -> {
+                    if (booking.getStatus() == BookingStatus.CANCELLED) {
+                        return booking; // уже отменено
+                    }
+                    booking.setStatus(BookingStatus.CANCELLED);
+                    booking.getRoom().setAvailable(true);
+                    repository.getRoomRepository().save(booking.getRoom());
+                    return repository.getBookingRepository().save(booking);
+                });
+    }
+
+    public Optional<Booking> pay(Integer bookingId) {
+        User user = getAuthentifactedUser();
+
+        return repository.getBookingRepository().findById(bookingId)
+                .filter(b -> b.getUser().getId().equals(user.getId()))
+                .map(booking -> {
+                    if (booking.getStatus() == BookingStatus.PENDING) {
+                        booking.setStatus(BookingStatus.CONFIRMED);
+                        return repository.getBookingRepository().save(booking);
+                    }
+                    return booking; // не меняем, если уже оплачен или отменён
+                });
     }
 
     public void delete(Integer id) {

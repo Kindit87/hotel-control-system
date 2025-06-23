@@ -76,7 +76,32 @@ public class BookingController extends ApiController<BookingService> {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+    public ResponseEntity<Booking> cancelBooking(@PathVariable Integer id) {
+        return bookingService.cancel(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/me/{id}/cancel")
+    @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
+    public ResponseEntity<Booking> cancelMyBooking(@PathVariable Integer id) {
+        return bookingService.cancelMy(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/me/{id}/pay")
+    @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
+    public ResponseEntity<Booking> payForMyBooking(@PathVariable Integer id) {
+        return bookingService.pay(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
+    }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
     public ResponseEntity<Void> deleteBooking(@PathVariable Integer id) {
         bookingService.delete(id);
         return ResponseEntity.noContent().build();
