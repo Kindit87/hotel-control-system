@@ -42,13 +42,19 @@ public class RoomService extends ServiceController {
                     List<Booking> bookings = repository.getBookingRepository().findByRoomId(room.getId());
 
                     return bookings.stream()
-                            .filter(booking -> booking.getStatus() != BookingStatus.CANCELLED) // фильтруем отменённые
+                            .filter(b -> !isInactive(b.getStatus()))
                             .noneMatch(b ->
                                     !checkOut.isBefore(b.getCheckInDate()) &&
                                             !checkIn.isAfter(b.getCheckOutDate())
                             );
                 })
                 .collect(Collectors.toList());
+    }
+
+    private boolean isInactive(BookingStatus status) {
+        return status == BookingStatus.CANCELLED ||
+                status == BookingStatus.CHECKED_OUT ||
+                status == BookingStatus.NO_SHOW;
     }
 
     public Room createRoom(RoomRequest request) {
