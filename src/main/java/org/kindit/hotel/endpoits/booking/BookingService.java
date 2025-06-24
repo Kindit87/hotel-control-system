@@ -55,8 +55,14 @@ public class BookingService extends ServiceController {
         Room room = repository.getRoomRepository().findById(request.getRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("Room not found"));
 
+        List<BookingStatus> activeStatuses = List.of(
+                BookingStatus.PENDING,
+                BookingStatus.CONFIRMED,
+                BookingStatus.CHECKED_IN
+        );
+
         List<Booking> existingBookings = repository.getBookingRepository()
-                .findByRoomId(room.getId());
+                .findByRoomIdAndStatusIn(room.getId(), activeStatuses);
 
         boolean isOverlapping = existingBookings.stream().anyMatch(b ->
                 !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
@@ -106,8 +112,14 @@ public class BookingService extends ServiceController {
         Room room = repository.getRoomRepository().findById(request.getRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("Room not found"));
 
+        List<BookingStatus> activeStatuses = List.of(
+                BookingStatus.PENDING,
+                BookingStatus.CONFIRMED,
+                BookingStatus.CHECKED_IN
+        );
+
         List<Booking> existingBookings = repository.getBookingRepository()
-                .findByRoomId(room.getId());
+                .findByRoomIdAndStatusIn(room.getId(), activeStatuses);
 
         boolean isOverlapping = existingBookings.stream().anyMatch(b ->
                 !request.getCheckInDate().isAfter(b.getCheckOutDate()) &&
@@ -134,8 +146,8 @@ public class BookingService extends ServiceController {
                 .checkInDate(request.getCheckInDate())
                 .checkOutDate(request.getCheckOutDate())
                 .additionalServices(services)
-                .totalPrice(totalPrice + additionalServicesPrice)
                 .status(BookingStatus.PENDING)
+                .totalPrice(totalPrice + additionalServicesPrice)
                 .build();
 
         return Optional.of(repository.getBookingRepository().save(booking));
