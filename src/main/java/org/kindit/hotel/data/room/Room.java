@@ -21,6 +21,7 @@ public class Room {
     private Integer id;
 
     private Integer number;
+    private String name;
     private Integer capacity;
     private Integer pricePerNight;
     private String description;

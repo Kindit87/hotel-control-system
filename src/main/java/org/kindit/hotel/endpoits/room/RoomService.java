@@ -68,6 +68,7 @@ public class RoomService extends ServiceController {
 
         Room room = Room.builder()
                 .number(request.getNumber())
+                .name(request.getName())
                 .pricePerNight(request.getPricePerNight())
                 .capacity(request.getCapacity())
                 .description(request.getDescription())
@@ -85,6 +86,7 @@ public class RoomService extends ServiceController {
                     .findAllById(request.getAdditionalServiceIds());
 
             existing.setNumber(request.getNumber());
+            existing.setName(request.getName());
             existing.setPricePerNight(request.getPricePerNight());
             existing.setDescription(request.getDescription());
             existing.setCapacity(request.getCapacity());
@@ -102,6 +104,9 @@ public class RoomService extends ServiceController {
         return repository.getRoomRepository().findById(id).map(existing -> {
             if (request.getNumber() != null)
                 existing.setNumber(request.getNumber());
+
+            if (request.getName() != null)
+                existing.setName(request.getName());
 
             if (request.getPricePerNight() != null)
                 existing.setPricePerNight(request.getPricePerNight());

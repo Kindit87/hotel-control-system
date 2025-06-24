@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RoomRequest {
     private Integer number;
+    private String name;
     private Integer pricePerNight;
     private Integer capacity;
     private String description;
