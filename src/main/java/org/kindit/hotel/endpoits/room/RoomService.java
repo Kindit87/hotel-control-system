@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.kindit.hotel.data.additionalService.AdditionalService;
 import org.kindit.hotel.data.booking.Booking;
+import org.kindit.hotel.data.booking.BookingStatus;
 import org.kindit.hotel.data.room.Room;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.room.request.RoomRequest;
@@ -39,10 +40,13 @@ public class RoomService extends ServiceController {
         return allRooms.stream()
                 .filter(room -> {
                     List<Booking> bookings = repository.getBookingRepository().findByRoomId(room.getId());
-                    return bookings.stream().noneMatch(b ->
-                            !checkOut.isBefore(b.getCheckInDate()) &&
-                                    !checkIn.isAfter(b.getCheckOutDate())
-                    );
+
+                    return bookings.stream()
+                            .filter(booking -> booking.getStatus() != BookingStatus.CANCELLED) // фильтруем отменённые
+                            .noneMatch(b ->
+                                    !checkOut.isBefore(b.getCheckInDate()) &&
+                                            !checkIn.isAfter(b.getCheckOutDate())
+                            );
                 })
                 .collect(Collectors.toList());
     }
