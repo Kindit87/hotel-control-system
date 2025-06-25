@@ -5,11 +5,10 @@ import org.kindit.hotel.data.booking.Booking;
 import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
 import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/booking")
@@ -20,8 +19,15 @@ public class BookingController extends ApiController<BookingService> {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        return ResponseEntity.ok(bookingService.getAll());
+    public ResponseEntity<Page<Booking>> getAllBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long userId
+    ) {
+        return ResponseEntity.ok(
+                bookingService.getAll(page, size, status, userId)
+        );
     }
 
     @GetMapping("/{id}")
@@ -34,9 +40,14 @@ public class BookingController extends ApiController<BookingService> {
 
     @GetMapping("/me/all")
     @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
-    public ResponseEntity<List<Booking>> getMyBookings() {
-        return ResponseEntity.ok(bookingService.getAllMy());
+    public ResponseEntity<Page<Booking>> getMyBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status
+    ) {
+        return ResponseEntity.ok(bookingService.getAllMy(page, size, status));
     }
+
 
     @GetMapping("/me/{id}")
     @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")

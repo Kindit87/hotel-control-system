@@ -10,6 +10,10 @@ import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
 import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +26,41 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookingService extends ServiceController {
 
-    public List<Booking> getAll() {
-        return repository.getBookingRepository().findAll();
+    public Page<Booking> getAll(int page, int size, String status, Long userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("checkInDate").descending());
+
+        if (status != null && userId != null) {
+            return repository.getBookingRepository()
+                    .findByStatusAndUserId(BookingStatus.valueOf(status), userId, pageable);
+        } else if (status != null) {
+            return repository.getBookingRepository()
+                    .findByStatus(BookingStatus.valueOf(status), pageable);
+        } else if (userId != null) {
+            return repository.getBookingRepository()
+                    .findByUserId(userId, pageable);
+        } else {
+            return repository.getBookingRepository().findAll(pageable);
+        }
     }
+
 
     public Optional<Booking> get(Integer id) {
         return repository.getBookingRepository().findById(id);
     }
 
-    public List<Booking> getAllMy() {
-        return repository.getBookingRepository().findByUserId(getAuthentifactedUser().getId());
+    public Page<Booking> getAllMy(int page, int size, String status) {
+        Pageable pageable = PageRequest.of(page, size);
+        Long userId = Long.valueOf(getAuthentifactedUser().getId());
+
+        if (status != null) {
+            return repository.getBookingRepository().findByStatusAndUserId(
+                    BookingStatus.valueOf(status),
+                    userId,
+                    pageable
+            );
+        } else {
+            return repository.getBookingRepository().findByUserId(userId, pageable);
+        }
     }
 
     public Optional<Booking> getMy(Integer id) {
