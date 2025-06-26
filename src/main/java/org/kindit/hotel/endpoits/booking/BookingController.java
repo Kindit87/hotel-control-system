@@ -6,9 +6,12 @@ import org.kindit.hotel.endpoits.ApiController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
 import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/booking")
@@ -23,10 +26,14 @@ public class BookingController extends ApiController<BookingService> {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long userId
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String firstname,
+            @RequestParam(required = false) String lastname,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInTo
     ) {
         return ResponseEntity.ok(
-                bookingService.getAll(page, size, status, userId)
+                bookingService.getAll(page, size, status, email, firstname, lastname, checkInFrom, checkInTo)
         );
     }
 
@@ -43,11 +50,14 @@ public class BookingController extends ApiController<BookingService> {
     public ResponseEntity<Page<Booking>> getMyBookings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInTo
     ) {
-        return ResponseEntity.ok(bookingService.getAllMy(page, size, status));
+        return ResponseEntity.ok(
+                bookingService.getAllMy(page, size, status, checkInFrom, checkInTo)
+        );
     }
-
 
     @GetMapping("/me/{id}")
     @PreAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")

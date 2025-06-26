@@ -10,10 +10,7 @@ import org.kindit.hotel.data.user.User;
 import org.kindit.hotel.endpoits.ServiceController;
 import org.kindit.hotel.endpoits.booking.request.BookingRequest;
 import org.kindit.hotel.endpoits.booking.request.MyBookingRequest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -21,26 +18,56 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class BookingService extends ServiceController {
 
-    public Page<Booking> getAll(int page, int size, String status, Long userId) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("checkInDate").descending());
+    public Page<Booking> getAll(
+            int page, int size, String status, String email,
+            String firstname, String lastname,
+            LocalDate checkInFrom, LocalDate checkInTo)
+    {
+        List<Booking> bookings;
 
-        if (status != null && userId != null) {
-            return repository.getBookingRepository()
-                    .findByStatusAndUserId(BookingStatus.valueOf(status), userId, pageable);
-        } else if (status != null) {
-            return repository.getBookingRepository()
-                    .findByStatus(BookingStatus.valueOf(status), pageable);
-        } else if (userId != null) {
-            return repository.getBookingRepository()
-                    .findByUserId(userId, pageable);
+        if (status != null) {
+            try {
+                BookingStatus parsedStatus = BookingStatus.valueOf(status);
+                bookings = repository.getBookingRepository().findByStatus(parsedStatus, Pageable.unpaged()).getContent();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid booking status");
+            }
         } else {
-            return repository.getBookingRepository().findAll(pageable);
+            bookings = repository.getBookingRepository().findAll();
         }
+
+        Stream<Booking> stream = bookings.stream();
+
+        if (email != null && !email.isBlank()) {
+            stream = stream.filter(b -> b.getUser().getEmail().toLowerCase().contains(email.toLowerCase()));
+        }
+        if (firstname != null && !firstname.isBlank()) {
+            stream = stream.filter(b -> b.getUser().getFirstname().toLowerCase().contains(firstname.toLowerCase()));
+        }
+        if (lastname != null && !lastname.isBlank()) {
+            stream = stream.filter(b -> b.getUser().getLastname().toLowerCase().contains(lastname.toLowerCase()));
+        }
+        if (checkInFrom != null) {
+            stream = stream.filter(b -> !b.getCheckInDate().isBefore(checkInFrom));
+        }
+        if (checkInTo != null) {
+            stream = stream.filter(b -> !b.getCheckInDate().isAfter(checkInTo));
+        }
+
+        List<Booking> filtered = stream.toList();
+
+        int start = page * size;
+        int end = Math.min(start + size, filtered.size());
+        List<Booking> paged = (start <= end) ? filtered.subList(start, end) : List.of();
+
+        return new PageImpl<>(paged, PageRequest.of(page, size), filtered.size());
     }
 
 
@@ -48,19 +75,30 @@ public class BookingService extends ServiceController {
         return repository.getBookingRepository().findById(id);
     }
 
-    public Page<Booking> getAllMy(int page, int size, String status) {
-        Pageable pageable = PageRequest.of(page, size);
-        Long userId = Long.valueOf(getAuthentifactedUser().getId());
+    public Page<Booking> getAllMy(int page, int size, String statusStr, LocalDate checkInFrom, LocalDate checkInTo) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("checkInDate").descending());
 
-        if (status != null) {
-            return repository.getBookingRepository().findByStatusAndUserId(
-                    BookingStatus.valueOf(status),
-                    userId,
-                    pageable
-            );
-        } else {
-            return repository.getBookingRepository().findByUserId(userId, pageable);
+        Page<Booking> allBookings = repository.getBookingRepository().findByUserId(Long.valueOf(user.getId()), pageable);
+
+        final BookingStatus status;
+        try {
+            status = (statusStr != null) ? BookingStatus.valueOf(statusStr) : null;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid booking status: " + statusStr);
         }
+
+        List<Booking> filtered = allBookings.stream()
+                .filter(b -> status == null || b.getStatus() == status)
+                .filter(b -> checkInFrom == null || !b.getCheckInDate().isBefore(checkInFrom))
+                .filter(b -> checkInTo == null || !b.getCheckInDate().isAfter(checkInTo))
+                .collect(Collectors.toList());
+
+        int start = Math.min(page * size, filtered.size());
+        int end = Math.min(start + size, filtered.size());
+        List<Booking> pageContent = filtered.subList(start, end);
+
+        return new PageImpl<>(pageContent, pageable, filtered.size());
     }
 
     public Optional<Booking> getMy(Integer id) {
