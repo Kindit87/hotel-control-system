@@ -13,9 +13,9 @@
 ### 🛠️ Стек технологий
 
 * **Backend:** [Java, Spring Boot, Spring Security, Spring Data JPA, JWT]
-* **Frontend:** [Angular 17]
+* **Frontend:** [Angular 18]
 * **База данных:** [PostgreSQL]
-* **Деплой:** [Docker, Nginx, GitHub Actions]
+* **Деплой:** [Docker, Nginx]
 
 ---
 
